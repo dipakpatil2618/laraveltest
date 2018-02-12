@@ -7,11 +7,11 @@
                         {!! Form::hidden('dairy_user_id',$dairyData->user_id) !!}
                     	<div>
                     		{!! Form::label('Title', 'Title') !!}
-                    		{!! Form::text('dairy_title',$dairyData->title,array('required'=>'required')) !!}
+                    		{!! Form::text('dairy_title',$dairyData->title,array('class'=>'form-control'),array('required'=>'required')) !!}
                     	</div>
                     	<div>
                     		{!! Form::label('Description', 'Description') !!}
-                    		{!! Form::textarea('dairy_description',$dairyData->description,array('required'=>'required')) !!}
+                    		{!! Form::textarea('dairy_description',$dairyData->description,array('class'=>'form-control'),array('required'=>'required')) !!}
                     	</div>
                     	<div>
                     		{!! Form::submit('Save') !!}

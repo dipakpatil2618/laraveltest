@@ -3,18 +3,18 @@
 @section('dairy')
                 <div>
                     {!! Form::open(['action' => 'DairyController@store', 'method' => 'post', 'class' => 'form']) !!}
-                    	{!! Form::token(); !!}
-                    	<div>
-                    		{!! Form::label('Title', 'Title') !!}
-                    		{!! Form::text('dairy_title','',array('required'=>'required')) !!}
-                    	</div>
-                    	<div>
-                    		{!! Form::label('Description', 'Description') !!}
-                    		{!! Form::textarea('dairy_description','',array('required'=>'required')) !!}
-                    	</div>
-                    	<div>
-                    		{!! Form::submit('Save') !!}
-                    	</div>	
+                        {!! Form::token(); !!}
+                        <div class="form-group">
+                            {!! Form::label('Title', 'Title') !!}
+                            {!! Form::text('dairy_title','',array('class'=>'form-control'),array('required'=>'required') ) !!}
+                        </div >
+                        <div class="form-group">
+                            {!! Form::label('Description', 'Description') !!}
+                    {!! Form::textarea('dairy_description','',array('class' => 'form-control'),array('required'=>'required')) !!}
+                        </div>
+                        <div class="form-group">
+                            {!! Form::submit('Save') !!}
+                        </div>  
                     {!! Form::close() !!}
 
                     <form>
