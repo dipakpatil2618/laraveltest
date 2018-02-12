@@ -2,7 +2,7 @@
 
 @section('dairy')
                 <div>
-                    {!! Form::open(['action' => 'DairyController@store', 'method' => 'post']) !!}
+                    {!! Form::open(['action' => 'DairyController@store', 'method' => 'post', 'class' => 'form']) !!}
                     	{!! Form::token(); !!}
                     	<div>
                     		{!! Form::label('Title', 'Title') !!}
@@ -16,6 +16,9 @@
                     		{!! Form::submit('Save') !!}
                     	</div>	
                     {!! Form::close() !!}
+
+                    <form>
+
                 </div>
 
 @endsection

@@ -16,6 +16,10 @@
 
                     You are logged in!
                 </div>
+
+                <div class="card-body">
+                   <a href="{{ route('dairy') }}">Manage Dairy</a>
+                </div>
             </div>
         </div>
     </div>
