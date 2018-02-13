@@ -7,6 +7,7 @@ use App\Dairy;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Repositories\DairyRepositoryInterface;
+use Illuminate\Support\Facades\Log;
 
 class DairyController extends Controller
 {
@@ -23,10 +24,15 @@ class DairyController extends Controller
      */
     public function index()
     {
-        if (Auth::check()){
-               $userId =Auth::id();
-               $dairy = $this->dairyRepository->listDairy($userId);
-               return view('dairy.list',['dairyData' => $dairy]); 
+        try{
+            if (Auth::check()){
+                   $userId =Auth::id();
+                   $dairy = $this->dairyRepository->listDairy($userId);
+                   return view('dairy.list',['dairyData' => $dairy]); 
+            }
+        } catch (\Exception $e) {
+            Log::error("Problem in fetching list of dairy" . $e->getMessage());
+            return redirect('dairy/'); 
         }
 
             
@@ -51,26 +57,31 @@ class DairyController extends Controller
      */
     public function store(Request $request)
     {
-        $reqData = $request->all();
-        $rules = [
-            'dairy_title' => 'required|max:254',
-            'dairy_description' => 'required'
-        ];
-        $validator = Validator::make($reqData, $rules);
-        if ($validator->fails()) {
-            $request->session()->flash('message.level', 'error');
-            $request->session()->flash('message.content', $validator->errors());
+        try{
+            $reqData = $request->all();
+            $rules = [
+                'dairy_title' => 'required|max:254',
+                'dairy_description' => 'required'
+            ];
+            $validator = Validator::make($reqData, $rules);
+            if ($validator->fails()) {
+                $request->session()->flash('message.level', 'error');
+                $request->session()->flash('message.content', $validator->errors());
+            }
+            $dairyAdd = $this->dairyRepository->addDairy($reqData);
+            if($dairyAdd){
+                $request->session()->flash('message.level', 'success');
+                $request->session()->flash('message.content', 'Dairy was successfully added!');
+                
+            }else{
+                $request->session()->flash('message.level', 'error');
+                $request->session()->flash('message.content', 'Problem in adding Dairy!');
+            }
+            return redirect('dairy/');
+        } catch (\Exception $e) {
+            Log::error("Problem in adding dairy" . $e->getMessage());
+            return redirect('dairy/');
         }
-        $dairyAdd = $this->dairyRepository->addDairy($reqData);
-        if($dairyAdd){
-            $request->session()->flash('message.level', 'success');
-            $request->session()->flash('message.content', 'Dairy was successfully added!');
-            
-        }else{
-            $request->session()->flash('message.level', 'error');
-            $request->session()->flash('message.content', 'Problem in adding Dairy!');
-        }
-        return redirect('dairy/');
 
 
     }
@@ -84,15 +95,20 @@ class DairyController extends Controller
      */
     public function show($id)
     {
-        if (Auth::check()){
-            $userId =Auth::id();
-            $dairyData = $this->dairyRepository->showDairy($id,$userId);
-            if(count($dairyData)){
-                return view('dairy.show',['dairyData' => $dairyData]);
-            }
-        }   
-        //if something went wrong redirect to list page
-        return redirect('dairy/');
+        try{
+            if (Auth::check()){
+                $userId =Auth::id();
+                $dairyData = $this->dairyRepository->showDairy($id,$userId);
+                if(count($dairyData)){
+                    return view('dairy.show',['dairyData' => $dairyData]);
+                }
+            }   
+            //if something went wrong redirect to list page
+            return redirect('dairy/');
+        } catch (\Exception $e) {
+            Log::error("Problem in showing perticular dairy ".$id." : ". $e->getMessage());
+            return redirect('dairy/');
+        }
 
     }
 
@@ -120,26 +136,31 @@ class DairyController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $reqData = $request->all();
-        $rules = [
-            'dairy_title' => 'required|max:254',
-            'dairy_description' => 'required'
-        ];
-        $validator = Validator::make($reqData, $rules);
-        if ($validator->fails()) {
-             $request->session()->flash('message.level', 'error');
-             $request->session()->flash('message.content', $validator->errors());
+        try{
+            $reqData = $request->all();
+            $rules = [
+                'dairy_title' => 'required|max:254',
+                'dairy_description' => 'required'
+            ];
+            $validator = Validator::make($reqData, $rules);
+            if ($validator->fails()) {
+                 $request->session()->flash('message.level', 'error');
+                 $request->session()->flash('message.content', $validator->errors());
+            }
+            $dairyAdd = $this->dairyRepository->editDairy($reqData,$id);
+            if($dairyAdd){
+                $request->session()->flash('message.level', 'success');
+                $request->session()->flash('message.content', 'Dairy was successfully updated!');
+                
+            }else{
+                $request->session()->flash('message.level', 'error');
+                $request->session()->flash('message.content', 'Problem in updating Dairy!');
+            }
+            return redirect('dairy/');
+        } catch (\Exception $e) {
+            Log::error("Problem in updating dairy ".$id." : ". $e->getMessage());
+            return redirect('dairy/');
         }
-        $dairyAdd = $this->dairyRepository->editDairy($reqData,$id);
-        if($dairyAdd){
-            $request->session()->flash('message.level', 'success');
-            $request->session()->flash('message.content', 'Dairy was successfully updated!');
-            
-        }else{
-            $request->session()->flash('message.level', 'error');
-            $request->session()->flash('message.content', 'Problem in updating Dairy!');
-        }
-        return redirect('dairy/');
     }
 
     /**
@@ -150,14 +171,19 @@ class DairyController extends Controller
      */
     public function destroy(Request $request,$id)
     {
-        $dairyRemove = $this->dairyRepository->removeDairy($id);
-        if($dairyRemove){
-            $request->session()->flash('message.level', 'success');
-            $request->session()->flash('message.content', 'Dairy was successfully removed!');
-        }else{
-            $request->session()->flash('message.level', 'error');
-            $request->session()->flash('message.content', 'Problem in removing Dairy!');
+        try{
+            $dairyRemove = $this->dairyRepository->removeDairy($id);
+            if($dairyRemove){
+                $request->session()->flash('message.level', 'success');
+                $request->session()->flash('message.content', 'Dairy was successfully removed!');
+            }else{
+                $request->session()->flash('message.level', 'error');
+                $request->session()->flash('message.content', 'Problem in removing Dairy!');
+            }
+            return redirect('dairy/');
+        } catch (\Exception $e) {
+            Log::error("Problem in removing dairy ".$id." : ". $e->getMessage());
+            return redirect('dairy/');
         }
-        return redirect('dairy/');
     }
 }
